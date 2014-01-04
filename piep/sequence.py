@@ -36,7 +36,7 @@ class BaseList(object):
 			if isinstance(result, bool):
 				return line if result else None
 			return result
-		return self._replace(ifilter(lambda x: x is not None, imap(_transform, self.src)))
+		return self._replace(filter(lambda x: x is not None, map(_transform, self.src)))
 
 	def uniq(self, stable=False):
 		'''Remove duplicates. Note: if ``stable`` is not given (or is ``False``),
@@ -61,7 +61,7 @@ class BaseList(object):
 		>>> list(Stream([1,2,3,4]).zip(['one','two','three']))
 		[(1, 'one'), (2, 'two'), (3, 'three'), (4, None)]
 		'''
-		return self._replace(izip_longest(self.src, *others))
+		return self._replace(zip_longest(self.src, *others))
 
 	def zip_shortest(self, *others):
 		'''Like :data:`zip`, but stops once any of the sequences ends.
@@ -69,7 +69,7 @@ class BaseList(object):
 		>>> list(Stream([1,2,3,4]).zip_shortest(['one','two','three']))
 		[(1, 'one'), (2, 'two'), (3, 'three')]
 		'''
-		return self._replace(izip(self.src, *others))
+		return self._replace(zip(self.src, *others))
 
 	def map_index(self, fn):
 		i = [0]
@@ -82,7 +82,7 @@ class BaseList(object):
 
 	def filter(self, f=None):
 		'''alias for itertools.ifilter(self, f)'''
-		return self._replace(ifilter(f, self.src))
+		return self._replace(filter(f, self.src))
 
 	def join(self, s):
 		'''alias for ``s.join(self)``'''
@@ -104,7 +104,7 @@ class BaseList(object):
 		>>> list(Stream(["a\nb\nc","d\ne"]).flatten())
 		['a', 'b', 'c', 'd', 'e']
 		'''
-		return self._replace(chain.from_iterable(imap(lambda x: Line(x).splitlines(), self.src)))
+		return self._replace(chain.from_iterable(map(lambda x: Line(x).splitlines(), self.src)))
 
 	def sort(self, uniq=False):
 		'''
@@ -125,7 +125,7 @@ class BaseList(object):
 		  - ``attr`` will sort using the given attribute of each element: ``item.attr``
 		  - ``method`` will sort using the result of calling the given method (with no arguments) on each element: ``item.method()``
 		'''
-		defined_items = filter(lambda x: x is not None, (fn, key, attr, method))
+		defined_items = [x for x in (fn, key, attr, method) if x is not None]
 		assert len(defined_items) == 1, "exactly one of (fn, key, attr, method) arguments allowed to `sortby` method (you gave %s: %r)" % (len(defined_items), defined_items)
 
 		if key is not None: fn = operator.itemgetter(key)
@@ -267,7 +267,7 @@ class Stream(BaseList):
 	def __repr__(self):
 		return repr(list(self.src))
 
-	def __nonzero__(self):
+	def __bool__(self):
 		"""
 		>>> bool(Stream([1,2,3]))
 		True
@@ -328,9 +328,9 @@ class pad_end(object):
 		try:
 			old_item = self._cache[self._cache_head]
 		except IndexError as e:
-			print("Key Error %s" % (e,))
-			print("cache = %r" % (self._cache))
-			print("cache head = %r" % (self._cache_head))
+			print(("Key Error %s" % (e,)))
+			print(("cache = %r" % (self._cache)))
+			print(("cache head = %r" % (self._cache_head)))
 			return 'NOPE'
 			#raise
 		self._cache[self._cache_head] = item

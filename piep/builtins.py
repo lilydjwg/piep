@@ -22,8 +22,8 @@ Aliases:
 Globally-accessible functions:
 
 '''
-from __future__ import print_function
-import __builtin__
+
+import builtins
 import subprocess
 import re, os, sys
 
@@ -51,7 +51,7 @@ add_builtin(List, 'List')
 def len(obj):
 	'''like the builtin ``len``, but works (destructively) on iterators.'''
 	try:
-		return __builtin__.len(obj)
+		return builtins.len(obj)
 	except TypeError as e:
 		try:
 			it = iter(obj)
@@ -100,7 +100,7 @@ def pretty(obj):
 @add_builtin
 def _ensure_piep_sequence(pp):
 	if not isinstance(pp, BaseList):
-		if isinstance(pp, basestring):
+		if isinstance(pp, str):
 			pp = pp.splitlines()
 		# if the last expr turned pp into a normal list or some other iterable, fix that...
 		cls = Stream
